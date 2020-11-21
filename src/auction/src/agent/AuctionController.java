@@ -2,6 +2,9 @@ package agent;
 
 // Generic imports
 import java.util.Random;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 // Logist imports
 import logist.Measures;
@@ -11,19 +14,22 @@ import logist.task.Task;
 
 public class AuctionController {
 
-    public Long givePrice(Task task, Vehicle vehicle, City currentCity, Random random) {
-        if (vehicle.capacity() < task.weight)
-        return null;
 
-        long distanceTask = task.pickupCity.distanceUnitsTo(task.deliveryCity);
-        long distanceSum = distanceTask
-                + currentCity.distanceUnitsTo(task.pickupCity);
-        double marginalCost = Measures.unitsToKM(distanceSum
-                * vehicle.costPerKm());
+    private List<Long[]> bidHistory = new ArrayList<Long[]>();
+    private List<Integer> winHistory = new ArrayList<Integer>();
 
-        double ratio = 1.0 + (random.nextDouble() * 0.05 * task.id);
-        double bid = ratio * marginalCost;
+    public void printBidHistory(){
+        System.out.println(bidHistory);
+        System.out.println(winHistory);
+    }
 
-        return (long) Math.round(bid);
+    public void updateBidHistory(int winner, Long[] bids){
+        bidHistory.add(bids);
+        winHistory.add(winner);
+        printBidHistory();
+    }
+
+    public Long returnPrice(Task task) {
+        return (long) Math.round(0);
     }
 }

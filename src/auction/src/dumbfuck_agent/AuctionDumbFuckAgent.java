@@ -1,4 +1,4 @@
-package agent;
+package dumbfuck_agent;
 
 //the list of imports
 import java.util.ArrayList;
@@ -16,8 +16,6 @@ import logist.task.TaskSet;
 import logist.topology.Topology;
 import logist.topology.Topology.City;
 
-import agent.AuctionController;
-
 
 
 /**
@@ -26,7 +24,7 @@ import agent.AuctionController;
  * 
  */
 @SuppressWarnings("unused")
-public class AuctionAgent implements AuctionBehavior {
+public class AuctionDumbFuckAgent implements AuctionBehavior {
 
 	private Topology topology;
 	private TaskDistribution distribution;
@@ -34,7 +32,6 @@ public class AuctionAgent implements AuctionBehavior {
 	private Random random;
 	private Vehicle vehicle;
 	private City currentCity;
-	private AuctionController auctionController;
 
 	@Override
 	public void setup(Topology topology, TaskDistribution distribution,
@@ -47,26 +44,19 @@ public class AuctionAgent implements AuctionBehavior {
 
 		long seed = -9019554669489983951L * currentCity.hashCode() * agent.id();
 		this.random = new Random(seed);
-
-		System.out.println("ID  : " + agent.id());
 	}
 
 	@Override
 	/* handles auction results, if an auction is won, transfers it to our control algorithm */
 	public void auctionResult(Task previous, int winner, Long[] bids) {
-		
 		if (winner == agent.id()) {
 			currentCity = previous.deliveryCity;
 		}
-		//auctionController.updateBidHistory(winner, bids);
-
 	}
 	
 	@Override
 	/* method that is called when an auction is thrown */
 	public Long askPrice(Task task) {
-		//System.out.println("New Auction " + task);
-
 		if (vehicle.capacity() < task.weight)
 			return null;
 
@@ -84,6 +74,7 @@ public class AuctionAgent implements AuctionBehavior {
 	@Override
 	/* handles the creation of the delivery plan (this is where we should call centralized) */
 	public List<Plan> plan(List<Vehicle> vehicles, TaskSet tasks) {
+
 		Plan planVehicle1 = naivePlan(vehicle, tasks);
 
 		List<Plan> plans = new ArrayList<Plan>();
