@@ -19,14 +19,26 @@ public class AuctionController {
     private List<Integer> winHistory = new ArrayList<Integer>();
 
     public void printBidHistory(){
-        System.out.println(bidHistory);
-        System.out.println(winHistory);
+        for(int i = 0; i<this.bidHistory.size(); i++){
+            Long[] bids = this.bidHistory.get(i);
+            if(i < 10){
+                System.out.print("Bid#0"+i+"; ");
+            }
+            else{
+                System.out.print("Bid#"+i+"; ");
+            }            
+            for(Long bid : bids){
+                System.out.print(bid+", ");
+            }
+            System.out.println("won by : " + winHistory.get(i));
+        }
     }
 
     public void updateBidHistory(int winner, Long[] bids){
         bidHistory.add(bids);
         winHistory.add(winner);
-        printBidHistory();
+        if(winHistory.size() == 19) // kind'of arbitrary but ya know I wan't some example of data
+            printBidHistory();
     }
 
     public Long returnPrice(Task task) {

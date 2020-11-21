@@ -34,7 +34,7 @@ public class AuctionAgent implements AuctionBehavior {
 	private Random random;
 	private Vehicle vehicle;
 	private City currentCity;
-	private AuctionController auctionController;
+	private AuctionController auctionController = new AuctionController();
 
 	@Override
 	public void setup(Topology topology, TaskDistribution distribution,
@@ -58,7 +58,7 @@ public class AuctionAgent implements AuctionBehavior {
 		if (winner == agent.id()) {
 			currentCity = previous.deliveryCity;
 		}
-		//auctionController.updateBidHistory(winner, bids);
+		auctionController.updateBidHistory(winner, bids);;
 
 	}
 	
