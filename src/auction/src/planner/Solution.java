@@ -5,8 +5,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Collection;
 import java.lang.Exception;
+import java.util.Random;
 
 //Logist import
 import logist.simulation.Vehicle;
@@ -56,7 +56,7 @@ public class Solution implements Comparable<Solution>{
 			times.add(0);
 		}
 
-		//generate a list of "las	t pickups" so that we can correctly generate nextTask_t
+		//generate a list of "last pickups" so that we can correctly generate nextTask_t
 		List<PTask> lastPickup = new ArrayList<PTask>();
 		for (int i = 0; i < pickups.size(); i++) {
 			lastPickup.add(null);
@@ -126,7 +126,7 @@ public class Solution implements Comparable<Solution>{
 			this.vehicle.put(pickups.get(i), v);
 			this.vehicle.put(deliveries.get(i), v);
 
-			System.out.println("NEXT STEP\n");
+			//System.out.println("NEXT STEP\n");
 			
 			//this.nextTask_t.put(pickups.get(i), deliveries.get(i));
 			//this.vehicle.put(pickups.get(i), vMax);
@@ -143,14 +143,14 @@ public class Solution implements Comparable<Solution>{
 				//this.nextTask_v.put(v, null);
 				this.nextTask_v.put(vehicles.get(vID), null);
 		}
-		System.out.println("this.nextTask_t");
-		System.out.println(this.nextTask_t);
-		System.out.println("this.nextTask_v");
-		System.out.println(this.nextTask_v);
-		System.out.println("this.time");
-		System.out.println(this.time);
-		System.out.println("this.vehicle");
-		System.out.println(this.vehicle);
+		//System.out.println("this.nextTask_t");
+		//System.out.println(this.nextTask_t);
+		//System.out.println("this.nextTask_v");
+		//System.out.println(this.nextTask_v);
+		//System.out.println("this.time");
+		//System.out.println(this.time);
+		//System.out.println("this.vehicle");
+		//System.out.println(this.vehicle);
 	}
 	
 	public boolean valid(List<Constraint> constraints) {
@@ -279,7 +279,7 @@ public class Solution implements Comparable<Solution>{
 		this.updateTime(v);
 	}
 	
-	public List<Solution> neighbours(List<Constraint> constraints){
+	public List<Solution> neighbours(List<Constraint> constraints, Random gen, double proba){
 		List<Solution> solutions = new ArrayList<Solution>();
 		for (Vehicle v1: this.nextTask_v.keySet()) {
 			if (this.nextTask_v.get(v1) == null)
@@ -295,6 +295,8 @@ public class Solution implements Comparable<Solution>{
 					if (temp.valid(constraints)) {
 						solutions.add(temp);
 						//System.out.println("Gard !");
+						if (gen.nextDouble() <= proba)
+							solutions.addAll(temp.neighbours(constraints, gen, 0.0));
 					}
 				}
 				currentTaskV1 = this.nextTask_t.get(currentTaskV1);
@@ -309,6 +311,8 @@ public class Solution implements Comparable<Solution>{
 				if (temp.valid(constraints)) {
 					solutions.add(temp);
 					//System.out.println("Gard.");
+					if (gen.nextDouble() <= proba)
+						solutions.addAll(temp.neighbours(constraints, gen, 0.0));
 				}
 			}
 		}
