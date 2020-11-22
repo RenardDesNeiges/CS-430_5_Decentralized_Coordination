@@ -158,7 +158,11 @@ public class AuctionController {
         return ret;
     }
 
-    private Double cBound(Double p, Double mu, Double var, double n){    
+    private Double cBound(Double p, Double mu, Double var, double n){
+        Double lb =  mu - p*Math.sqrt(var/n);
+        if(lb < 0){
+            return 0.0;
+        }
         return mu - p*Math.sqrt(var/n);
     }
 
@@ -343,7 +347,7 @@ public class AuctionController {
             this.exCostHistory.add(null); // we add a null element as the 0 of exCostHistory so that the ids line up
             this.estimatorHistory.add(null);
 
-            price = 0.8*marginalCost;
+            price = 1.05*marginalCost;
             System.out.println("r1 : marg_cost = "+marginalCost + " ; price = " + Math.round(price));
         }  
         else{
@@ -361,7 +365,10 @@ public class AuctionController {
             for(Double e: this.errors()){
                 cumError += e;
             }
-            
+
+            if(marginalCost < 0){
+                marginalCost = 0.0;
+            }            
             Double margin = 0.1*marginalCost + 0.3*(cumError/(round-1));
             if(margin < 0){
                 margin = 10.0;

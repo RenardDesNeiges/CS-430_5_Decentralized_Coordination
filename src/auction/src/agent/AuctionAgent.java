@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-import javax.swing.plaf.basic.BasicBorders.MarginBorder;
 import javax.swing.plaf.synth.SynthMenuBarUI;
 import javax.swing.text.StyledEditorKit;
 
@@ -29,7 +28,6 @@ import logist.LogistSettings;
 import logist.task.TaskSet;
 
 import agent.AuctionController;
-
 import planner.Constraint;
 import planner.CapacityConstraint;
 import planner.OrderConstraint;
@@ -60,15 +58,14 @@ public class AuctionAgent implements AuctionBehavior {
 	private AuctionController auctionController;
 	private List<Plan> currentPlans;
 	private List<Plan> prevPlans;
-	private TaskSet currentTasks;
-	private TaskSet prevTasks;
-	private List<Task> taskList = new ArrayList<Task>();
+	private List<Task> currentTasks;
+	private List<Task> prevTasks;
 
 	@Override
 	public void setup(Topology topology, TaskDistribution distribution, Agent agent) {
 
 		// this code is used to get the timeouts
-        // LogistSettings ls = null;
+         //LogistSettings ls = null;
         // try {
         //     ls = Parsers.parseSettings("config" + File.separator + "settings_default.xml");
         // }
@@ -77,18 +74,17 @@ public class AuctionAgent implements AuctionBehavior {
         // }
         
         // the setup method cannot last more than timeout_setup milliseconds
-        this.timeout_setup = 1000;//ls.get(LogistSettings.TimeoutKey.SETUP);
+        this.timeout_setup = 30000;//ls.get(LogistSettings.TimeoutKey.SETUP);
         // the plan method cannot execute more than timeout_plan milliseconds
-        this.timeout_plan = 1000;// ls.get(LogistSettings.TimeoutKey.PLAN);
+        this.timeout_plan = 30000;// ls.get(LogistSettings.TimeoutKey.PLAN);
         // the bid method cannot execute more than timeout_bid milliseconds
-        this.timeout_bid = 1000;// ls.get(LogistSettings.TimeoutKey.BID);
+        this.timeout_bid = 30000;// ls.get(LogistSettings.TimeoutKey.BID);
         
         this.topology = topology;
         this.distribution = distribution;
 		this.agent = agent;
-
-		this.auctionController = new AuctionController(topology,this.agent.id());
 		
+		this.auctionController = new AuctionController(this.topology,this.agent.id());
         
         long seed = -9019554669489983951L * this.agent.hashCode() * agent.id();
 		this.randomGenerator = new Random(seed);
@@ -100,8 +96,8 @@ public class AuctionAgent implements AuctionBehavior {
 			this.prevPlans.add(Plan.EMPTY);
 		}
 		Task[] empty = {};
-		this.currentTasks = TaskSet.create(empty);
-		this.prevTasks = this.currentTasks;
+		this.currentTasks = new ArrayList<Task>();
+		this.prevTasks = new ArrayList<Task>();
 	}
 
 	@Override
@@ -109,10 +105,14 @@ public class AuctionAgent implements AuctionBehavior {
 	public void auctionResult(Task previous, int winner, Long[] bids) {
 		
 		if (winner != this.agent.id()) {
+			System.out.println("lost...");
 			this.currentPlans = this.prevPlans;
 			this.currentTasks = this.prevTasks;
 		}
-		this.auctionController.updateBidHistory(winner, bids,previous);
+		else{
+			System.out.println("WON!");
+		}
+		this.auctionController.updateBidHistory(winner, bids, previous);
 		
 	}
 	
@@ -128,27 +128,23 @@ public class AuctionAgent implements AuctionBehavior {
 	@Override
 	/* method that is called when an auction is thrown */
 	public Long askPrice(Task task) {
-
-		this.taskList.add(task);
-		this.prevTasks = this.currentTasks;
-		Task[] temp = new Task[taskList.size()];
-		for(int i = 0; i<taskList.size();i+=1){
-			temp[i] = taskList.get(i);
-		}
-		this.currentTasks = TaskSet.create(temp);
+		this.prevTasks = new ArrayList<Task>();
+		for (Task t: this.currentTasks)
+			this.prevTasks.add(t);
+		this.currentTasks.add(task);
 		
 		this.prevPlans = this.currentPlans;
 		this.currentPlans = this.planify(this.agent.vehicles(), this.currentTasks);
-
-		double maginalCost = this.costPlans(this.currentPlans) - this.costPlans(this.prevPlans);
-		return this.auctionController.returnPrice(task,maginalCost);
+		
+		
+		double marginalCost = this.costPlans(this.currentPlans) - this.costPlans(this.prevPlans);
+		return this.auctionController.returnPrice(task, marginalCost);
 		
 	}
 
 	/* handles the creation of the delivery plan (this is where we should call centralized) */
-	public List<Plan> planify(List<Vehicle> vehicles, TaskSet tasks) {
+	public List<Plan> planify(List<Vehicle> vehicles, List<Task> tasks) {
 		List<Plan> plans = new ArrayList<Plan>();
-
 		this.pickups = convertPickup(tasks);
 		this.deliveries = convertDeliveries(tasks);
 		
@@ -169,7 +165,7 @@ public class AuctionAgent implements AuctionBehavior {
 		
 		int iterations = 0;
 		long time_start = System.currentTimeMillis();
-		while(System.currentTimeMillis()-time_start <= this.timeout_bid-9000*this.timeout_bid/10000) {
+		while(System.currentTimeMillis()-time_start <= this.timeout_bid-this.timeout_bid/10.0) {
 			neighbours = guess.neighbours(this.constraints, this.randomGenerator, 0.1);
 			guess = this.localChoice(guess, neighbours, this.probability);
 			iterations++;
@@ -206,7 +202,7 @@ public class AuctionAgent implements AuctionBehavior {
 	
 	
 	
-	private List<PTask> convertPickup(TaskSet tasks){
+	private List<PTask> convertPickup(List<Task> tasks){
 		List<PTask> pTasks = new ArrayList<PTask>();
 		for (Task task: tasks) {
 			pTasks.add(new PTask(task.id, task.pickupCity, true, task.weight));
@@ -214,7 +210,7 @@ public class AuctionAgent implements AuctionBehavior {
 		return pTasks;
 	}	
 	
-	private List<PTask> convertDeliveries(TaskSet tasks){
+	private List<PTask> convertDeliveries(List<Task> tasks){
 		List<PTask> deliveries = new ArrayList<PTask>();
 		for (Task task: tasks)
 			deliveries.add(new PTask(task.id, task.deliveryCity, false, task.weight));
@@ -223,12 +219,8 @@ public class AuctionAgent implements AuctionBehavior {
 							
 	private Solution localChoice(Solution currentGuess, List<Solution> currentNeighbours, double probability) {
 		Collections.shuffle(currentNeighbours);
-		//System.out.println(currentNeighbours);
 		Solution min = Collections.min(currentNeighbours);
-		//for (Solution sol: currentNeighbours)
-			//System.out.println(sol.cost());
-		//System.out.println("Chosen: " + currentGuess.toString() + min.cost());
-		
+
 		if (this.randomGenerator.nextDouble() <= this.probability) {
 			return currentNeighbours.get(0);
 		}
@@ -237,7 +229,17 @@ public class AuctionAgent implements AuctionBehavior {
 		}
 	}
 	
-	public List<Plan> plan(List<Vehicle> dummy1, TaskSet dummy2){
-		return this.currentPlans;
+	public List<Plan> plan(List<Vehicle> vehicle, TaskSet tasks){
+		// System.out.print(this.currentPlans);
+		// for(Plan p : this.currentPlans){
+		// 	System.out.println(p);
+		// 	System.out.println();
+		// }
+		// System.out.println(tasks);
+		ArrayList<Task> tl = new ArrayList<Task>();
+		for(Task t : tasks){
+			tl.add(t);
+		}
+		return this.planify(vehicle, tl);
 	}
 }

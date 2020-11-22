@@ -1,1 +1,1 @@
-java -jar ../logist/logist.jar config/auction.xml auction-agent auction-dumbfuck 
+java -jar ../logist/logist.jar config/auction_fr.xml auction-agent auction-dumbfuck 
