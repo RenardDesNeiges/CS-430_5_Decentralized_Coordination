@@ -363,6 +363,9 @@ public class AuctionController {
             }
             
             Double margin = 0.1*marginalCost + 0.3*(cumError/(round-1));
+            if(margin < 0){
+                margin = 10.0;
+            }
 
             //this is where the strategy has to be implemented
             
