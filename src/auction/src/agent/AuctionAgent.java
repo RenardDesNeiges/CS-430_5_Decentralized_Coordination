@@ -4,6 +4,10 @@ package agent;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+
+import javax.swing.plaf.synth.SynthMenuBarUI;
+import javax.swing.text.StyledEditorKit;
+
 import java.io.File;
 import java.util.Collections;
 
@@ -58,6 +62,7 @@ public class AuctionAgent implements AuctionBehavior {
 	private List<Plan> prevPlans;
 	private TaskSet currentTasks;
 	private TaskSet prevTasks;
+	private List<Task> taskList = new ArrayList<Task>();
 
 	@Override
 	public void setup(Topology topology, TaskDistribution distribution, Agent agent) {
@@ -122,13 +127,19 @@ public class AuctionAgent implements AuctionBehavior {
 	@Override
 	/* method that is called when an auction is thrown */
 	public Long askPrice(Task task) {
+		this.taskList.add(task);
 		this.prevTasks = this.currentTasks;
-		Task[] temp = {task};
-		TaskSet temp2 = TaskSet.create(temp);
-		this.currentTasks = TaskSet.union(this.currentTasks,temp2);
+		Task[] temp = new Task[taskList.size()];
+		for(int i = 0; i<taskList.size();i+=1){
+			temp[i] = taskList.get(i);
+		}
+		this.currentTasks = TaskSet.create(temp);
 		
 		this.prevPlans = this.currentPlans;
+		System.out.println("AuctionAgent.askPrice()");
 		this.currentPlans = this.planify(this.agent.vehicles(), this.currentTasks);
+		
+		System.out.println("wegood");
 		
 		double maginalCost = this.costPlans(this.currentPlans) - this.costPlans(this.prevPlans);
 		
@@ -140,7 +151,7 @@ public class AuctionAgent implements AuctionBehavior {
 	/* handles the creation of the delivery plan (this is where we should call centralized) */
 	public List<Plan> planify(List<Vehicle> vehicles, TaskSet tasks) {
 		List<Plan> plans = new ArrayList<Plan>();
-		
+		System.out.println("0");
 		this.pickups = convertPickup(tasks);
 		this.deliveries = convertDeliveries(tasks);
 		
@@ -155,20 +166,23 @@ public class AuctionAgent implements AuctionBehavior {
 					break;
 				}
 		}
-		
+		System.out.println("1");
 		Solution guess = new Solution();
 		List<Solution> neighbours = new ArrayList<Solution>();
+		System.out.println("2");
 		guess.firstGuess(vehicles, this.pickups, this.deliveries);
 		
 		System.out.println("Building plan. Time allowed = " + (this.timeout_plan/60000));
 		int iterations = 0;
+		System.out.println("3");
 		long time_start = System.currentTimeMillis();
+		System.out.println("4");
 		while(System.currentTimeMillis()-time_start <= this.timeout_bid-1000) {
 			neighbours = guess.neighbours(this.constraints, this.randomGenerator, 0.1);
 			guess = this.localChoice(guess, neighbours, this.probability);
 			iterations++;
 		}
-		
+
 		for (Vehicle v: vehicles) {
 			if (guess.getNextTask_v().get(v) == null)
 				plans.add(Plan.EMPTY);
