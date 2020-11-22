@@ -101,7 +101,7 @@ public class Solution implements Comparable<Solution>{
 			}
 			else{
 				this.nextTask_t.put(lastPickup.get(vID), pickups.get(i));
-				System.out.println(this.nextTask_t.get(lastPickup.get(vID)));
+				//System.out.println(this.nextTask_t.get(lastPickup.get(vID)));
 			}
 			lastPickup.set(vID, deliveries.get(i));
 			
