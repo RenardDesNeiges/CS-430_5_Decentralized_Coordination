@@ -89,11 +89,14 @@ public class AuctionAgent implements AuctionBehavior {
 			this.currentPlans.add(Plan.EMPTY);
 			this.prevPlans.add(Plan.EMPTY);
 		}
+		Task[] empty = {};
+		this.currentTasks = TaskSet.create(empty);
+		this.prevTasks = this.currentTasks;
 	}
 
 	@Override
 	/* handles auction results, if an auction is won, transfers it to our control algorithm */
-	public void auctionResult(Task previous, int winner, long[] bids) {
+	public void auctionResult(Task previous, int winner, Long[] bids) {
 		
 		if (winner != this.agent.id()) {
 			this.currentPlans = this.prevPlans;
@@ -101,15 +104,33 @@ public class AuctionAgent implements AuctionBehavior {
 		}
 		
 		auctionController.updateBidHistory(winner, bids);
+		
 	}
+	
+	public double costPlans(List<Plan> plans) {
+		double res = 0.0;
+		for (int i = 0; i< this.agent.vehicles().size(); i++) {
+			res += this.agent.vehicles().get(i).costPerKm()*plans.get(i).totalDistance();
+		}
+		return res;
+	}
+
 	
 	@Override
 	/* method that is called when an auction is thrown */
-	public long askPrice(Task task) {
+	public Long askPrice(Task task) {
 		this.prevTasks = this.currentTasks;
 		Task[] temp = {task};
 		TaskSet temp2 = TaskSet.create(temp);
 		this.currentTasks = TaskSet.union(this.currentTasks,temp2);
+		
+		this.prevPlans = this.currentPlans;
+		this.currentPlans = this.planify(this.agent.vehicles(), this.currentTasks);
+		
+		double maginalCost = this.costPlans(this.currentPlans) - this.costPlans(this.prevPlans);
+		
+		long temp3 = 0;
+		return temp3;
 		
 	}
 
@@ -221,5 +242,9 @@ public class AuctionAgent implements AuctionBehavior {
 		else {
 			return min;
 		}
+	}
+	
+	public List<Plan> plan(List<Vehicle> dummy1, TaskSet dummy2){
+		return this.currentPlans;
 	}
 }

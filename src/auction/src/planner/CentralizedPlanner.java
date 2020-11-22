@@ -93,7 +93,7 @@ public class CentralizedPlanner implements CentralizedBehavior{
 			System.out.println("Time" + (System.currentTimeMillis()-time_start));
 			System.out.println("Iteration: " + iteration);
 			System.out.println("Building Neighbours");
-			neighbours = guess.neighbours(constraints);
+			neighbours = guess.neighbours(constraints, this.randomGenerator, 0.1);
 			//System.out.println(neighbours);
 			System.out.println("Done !");
 			System.out.println("Choosing Guess");

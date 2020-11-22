@@ -15,12 +15,12 @@ import logist.task.Task;
 public class AuctionController {
 
 
-    private List<long[]> bidHistory = new ArrayList<long[]>();
+    private List<Long[]> bidHistory = new ArrayList<Long[]>();
     private List<Integer> winHistory = new ArrayList<Integer>();
 
     public void printBidHistory(){
         for(int i = 0; i<this.bidHistory.size(); i++){
-            long[] bids = this.bidHistory.get(i);
+            Long[] bids = this.bidHistory.get(i);
             if(i < 10){
                 System.out.print("Bid#0"+i+"; ");
             }
@@ -34,7 +34,7 @@ public class AuctionController {
         }
     }
 
-    public void updateBidHistory(int winner, long[] bids){
+    public void updateBidHistory(int winner, Long[] bids){
         bidHistory.add(bids);
         winHistory.add(winner);
         if(winHistory.size() == 19) // kind'of arbitrary but ya know I wan't some example of data
