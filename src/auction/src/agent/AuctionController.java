@@ -2,6 +2,9 @@ package agent;
 
 // Generic imports
 import java.util.Random;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 // Logist imports
 import logist.Measures;
@@ -11,19 +14,34 @@ import logist.task.Task;
 
 public class AuctionController {
 
-    public Long givePrice(Task task, Vehicle vehicle, City currentCity, Random random) {
-        if (vehicle.capacity() < task.weight)
-        return null;
 
-        long distanceTask = task.pickupCity.distanceUnitsTo(task.deliveryCity);
-        long distanceSum = distanceTask
-                + currentCity.distanceUnitsTo(task.pickupCity);
-        double marginalCost = Measures.unitsToKM(distanceSum
-                * vehicle.costPerKm());
+    private List<long[]> bidHistory = new ArrayList<long[]>();
+    private List<Integer> winHistory = new ArrayList<Integer>();
 
-        double ratio = 1.0 + (random.nextDouble() * 0.05 * task.id);
-        double bid = ratio * marginalCost;
+    public void printBidHistory(){
+        for(int i = 0; i<this.bidHistory.size(); i++){
+            long[] bids = this.bidHistory.get(i);
+            if(i < 10){
+                System.out.print("Bid#0"+i+"; ");
+            }
+            else{
+                System.out.print("Bid#"+i+"; ");
+            }            
+            for(Long bid : bids){
+                System.out.print(bid+", ");
+            }
+            System.out.println("won by : " + winHistory.get(i));
+        }
+    }
 
-        return (long) Math.round(bid);
+    public void updateBidHistory(int winner, long[] bids){
+        bidHistory.add(bids);
+        winHistory.add(winner);
+        if(winHistory.size() == 19) // kind'of arbitrary but ya know I wan't some example of data
+            printBidHistory();
+    }
+
+    public Long returnPrice(Task task) {
+        return (long) Math.round(0);
     }
 }

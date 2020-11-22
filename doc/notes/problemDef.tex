@@ -1,0 +1,93 @@
+\documentclass[11pt]{article}
+
+\usepackage{sectsty}
+\usepackage{graphicx}
+\usepackage[T1]{fontenc}
+\usepackage{epigraph} %quotes
+\usepackage{amssymb} %math symbols
+\usepackage{mathtools} %more math stuff
+\usepackage{amsthm} %theorems, proofs and lemmas
+\usepackage[ruled,vlined,linesnumbered]{algorithm2e} %algoritms/pseudocode
+
+%% Theorem notation
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{corollary}{Corollary}[theorem]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{problem}{Problem}[section]
+
+%% declaring abs so that it works nicely
+\DeclarePairedDelimiter\abs{\lvert}{\rvert}%
+\DeclarePairedDelimiter\norm{\lVert}{\rVert}%
+
+% Swap the definition of \abs* and \norm*, so that \abs
+% and \norm resizes the size of the brackets, and the 
+% starred version does not.
+\makeatletter
+\let\oldabs\abs
+\def\abs{\@ifstar{\oldabs}{\oldabs*}}
+%
+\let\oldnorm\norm
+\def\norm{\@ifstar{\oldnorm}{\oldnorm*}}
+\makeatother
+
+% Marges
+\topmargin=-0.45in
+\evensidemargin=0in
+\oddsidemargin=0in
+\textwidth=5.5in
+\textheight=9.0in
+\headsep=0.5in
+
+
+\title{Biding Algorithm - Problem Definition}
+\date{\today}
+%\author{Name}
+
+\begin{document}
+\maketitle	
+
+\subsection{General problem description}
+
+Our goal is to maximize our profit margin $M_p$ over all $n$ elements in the set $T$ of all $t_i$ auctions. Where $r(t_i)$ is the revenue from an auction ($r(t_i)=0$ of if the auction is lost) and $c(t_i)$ is the cost that carrying out an auctioned contract ($r(t_i)=0$ of if the auction is lost). In an adversarial setting where the contract is awarded to the lowest bidding agent $a$ (\textit{closed-bid first-price reverse auction}). Where $a\in A$ the set of all agents in the game. Our own agent is denoted as $\alpha \in A$.
+
+\begin{align}
+    M_p = \sum_{t_i \in T} r(t_i) - \sum_{t_i \in T} c(t_i)
+\end{align}
+
+At each step $i$ our profit margin varies by a values $\Delta M_p(i)$ :
+
+\begin{align}
+    \Delta M_p(i) = r(t_i) - c(t_i)
+\end{align}
+
+For a given \textit{task} our decision algorithm has the following informations : 
+\begin{align*}
+    \text{Cost of adding a given task to the plan : } && c(t_i) && \forall t_i \\
+    \text{Price offered by every agent for previous bids : } && p(t_i,a) && \forall t_i,a\\
+    \text{Cost of carrying out auction for previous bids : } && c(i) && \forall i \\
+    \text{Winner of a given bid : } && w(i) && \forall i
+\end{align*}
+
+The problem can essentially be thought of as a \textit{multi-armed bandit} problem with an exploration/exploitation tradeoff, we will use a variation on \textit{Thomson Sampling}. The general idea is to fit a probability distribution to estimate our winning probability at each bid. And then pick a bidding amount from that probability distribution in such a way that our expected winning value $\mathbb{E}\left(\Delta M_p(i)\right)$ is maximal (greedy algorithm). Or to pick a value at random out of a distribution constructed in such a way that our expected winning value is maximized over time but we don't give up on exploration, which actually tends to yield better results than the greedy solution (\textit{Thomson Sampling}).
+
+\section{Defining error}
+
+We define the error made for a given auction as follows :
+\begin{align}
+    e(i) = \min_{\forall a \in A/ \alpha} \left\lbrace p(t_i,a) \right\rbrace - p(t_i,\alpha) 
+\end{align}
+
+For auctions that our agent won we have $e(i_{won})\geq 0$, for auctions lost we have $e(i_{won})\leq 0$. 
+
+
+
+
+\begin{algorithm}[H]
+    \SetAlgoLined
+    \caption{Thompson Sampling For Automatic Bidding}
+    \Repeat(){no task remains to be auctioned}{
+        Compute 
+    }
+\end{algorithm}
+
+\end{document}

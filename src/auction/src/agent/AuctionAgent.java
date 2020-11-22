@@ -51,7 +51,7 @@ public class AuctionAgent implements AuctionBehavior {
 	private List<PTask> pickups;
 	private List<PTask> deliveries;
 	private List<Constraint> constraints;
-	private AuctionController auctionController;
+	private AuctionController auctionController = new AuctionController();
 	private List<Plan> currentPlans;
 	private List<Plan> prevPlans;
 	private TaskSet currentTasks;
@@ -94,11 +94,13 @@ public class AuctionAgent implements AuctionBehavior {
 	@Override
 	/* handles auction results, if an auction is won, transfers it to our control algorithm */
 	public void auctionResult(Task previous, int winner, long[] bids) {
+		
 		if (winner != this.agent.id()) {
 			this.currentPlans = this.prevPlans;
 			this.currentTasks = this.prevTasks;
 		}
 		
+		auctionController.updateBidHistory(winner, bids);
 	}
 	
 	@Override
