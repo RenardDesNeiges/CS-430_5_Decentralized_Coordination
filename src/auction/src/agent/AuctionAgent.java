@@ -7,6 +7,8 @@ import java.util.Random;
 import java.io.File;
 import java.util.Collections;
 
+import java.util.HashSet;
+
 import logist.config.Parsers;
 import logist.Measures;
 import logist.behavior.AuctionBehavior;
@@ -59,26 +61,27 @@ public class AuctionAgent implements AuctionBehavior {
 
 	@Override
 	public void setup(Topology topology, TaskDistribution distribution, Agent agent) {
-		
+		System.out.println("entering");
 		// this code is used to get the timeouts
-        LogistSettings ls = null;
-        try {
-            ls = Parsers.parseSettings("config" + File.separator + "settings_default.xml");
-        }
-        catch (Exception exc) {
-            System.out.println("There was a problem loading the configuration file.");
-        }
+        // LogistSettings ls = null;
+        // try {
+        //     ls = Parsers.parseSettings("config" + File.separator + "settings_default.xml");
+        // }
+        // catch (Exception exc) {
+        //     System.out.println("There was a problem loading the configuration file.");
+        // }
         
         // the setup method cannot last more than timeout_setup milliseconds
-        this.timeout_setup = ls.get(LogistSettings.TimeoutKey.SETUP);
+        this.timeout_setup = 300000;//ls.get(LogistSettings.TimeoutKey.SETUP);
         // the plan method cannot execute more than timeout_plan milliseconds
-        this.timeout_plan = ls.get(LogistSettings.TimeoutKey.PLAN);
+        this.timeout_plan = 300000;// ls.get(LogistSettings.TimeoutKey.PLAN);
         // the bid method cannot execute more than timeout_bid milliseconds
-        this.timeout_bid = ls.get(LogistSettings.TimeoutKey.BID);
+        this.timeout_bid = 300000;// ls.get(LogistSettings.TimeoutKey.BID);
         
         this.topology = topology;
         this.distribution = distribution;
-        this.agent = agent;
+		this.agent = agent;
+		
         
         long seed = -9019554669489983951L * this.agent.hashCode() * agent.id();
 		this.random = new Random(seed);
@@ -103,7 +106,7 @@ public class AuctionAgent implements AuctionBehavior {
 			this.currentTasks = this.prevTasks;
 		}
 		
-		auctionController.updateBidHistory(winner, bids);
+		//auctionController.updateBidHistory(winner, bids);
 		
 	}
 	
@@ -138,12 +141,9 @@ public class AuctionAgent implements AuctionBehavior {
 	public List<Plan> planify(List<Vehicle> vehicles, TaskSet tasks) {
 		List<Plan> plans = new ArrayList<Plan>();
 		
-		//System.out.println("Building Tasks");
 		this.pickups = convertPickup(tasks);
 		this.deliveries = convertDeliveries(tasks);
-		//System.out.println("Done !");
 		
-		//System.out.println("Building Constraints");
 		this.constraints = new ArrayList<Constraint>();
 		for(Vehicle vehicle: vehicles) 
 			this.constraints.add(new CapacityConstraint(vehicle));
@@ -155,27 +155,17 @@ public class AuctionAgent implements AuctionBehavior {
 					break;
 				}
 		}
-		//System.out.println("Done !");
 		
-		//System.out.println("Building first Guess");
 		Solution guess = new Solution();
 		List<Solution> neighbours = new ArrayList<Solution>();
 		guess.firstGuess(vehicles, this.pickups, this.deliveries);
-		//System.out.println("Done !");
 		
 		System.out.println("Building plan. Time allowed = " + (this.timeout_plan/60000));
 		int iterations = 0;
 		long time_start = System.currentTimeMillis();
 		while(System.currentTimeMillis()-time_start <= this.timeout_bid-1000) {
-			//System.out.println("Iteration: " + iterations);
-			//System.out.println("Building Neighbours");
 			neighbours = guess.neighbours(this.constraints, this.randomGenerator, 0.1);
-			//System.out.println(neighbours);
-			//System.out.println("Done !");
-			//System.out.println("Choosing Guess");
 			guess = this.localChoice(guess, neighbours, this.probability);
-			//System.out.println(guess);
-			//System.out.println("Done !");
 			iterations++;
 		}
 		
