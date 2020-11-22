@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path=""/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER">
+		<attributes>
+			<attribute name="module" value="true"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="C:/Users/Christophe Marciot/Desktop/Epfl/IntelligentAgent/CS-430_5_Decentralized_Coordination/src/logist/logist.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Christophe Marciot/Desktop/Epfl/IntelligentAgent/CS-430_5_Decentralized_Coordination/src/logist/lib/colt.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Christophe Marciot/Desktop/Epfl/IntelligentAgent/CS-430_5_Decentralized_Coordination/src/logist/lib/commons-math-1.1.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Christophe Marciot/Desktop/Epfl/IntelligentAgent/CS-430_5_Decentralized_Coordination/src/logist/lib/jdom.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Christophe Marciot/Desktop/Epfl/IntelligentAgent/CS-430_5_Decentralized_Coordination/src/logist/lib/jsolver.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Christophe Marciot/Desktop/Epfl/IntelligentAgent/CS-430_5_Decentralized_Coordination/src/logist/lib/plot.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Christophe Marciot/Desktop/Epfl/IntelligentAgent/CS-430_5_Decentralized_Coordination/src/logist/lib/repast.jar"/>
+	<classpathentry kind="output" path=""/>
+</classpath>

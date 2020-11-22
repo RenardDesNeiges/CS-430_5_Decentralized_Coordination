@@ -48,7 +48,6 @@ public class AuctionAgent implements AuctionBehavior {
 	private Topology topology;
 	private TaskDistribution distribution;
 	private Agent agent;
-	private Random random;
 	private long timeout_setup;
 	private long timeout_plan;
 	private long timeout_bid;
@@ -89,7 +88,7 @@ public class AuctionAgent implements AuctionBehavior {
 		
         
         long seed = -9019554669489983951L * this.agent.hashCode() * agent.id();
-		this.random = new Random(seed);
+		this.randomGenerator = new Random(seed);
 		
 		this.currentPlans = new ArrayList<Plan>();
 		this.prevPlans = new ArrayList<Plan>();
@@ -154,6 +153,8 @@ public class AuctionAgent implements AuctionBehavior {
 		System.out.println("0");
 		this.pickups = convertPickup(tasks);
 		this.deliveries = convertDeliveries(tasks);
+		System.out.println("Size pickups: " + this.pickups.size());
+		System.out.println("Size deliveries: " + this.deliveries.size());
 		
 		this.constraints = new ArrayList<Constraint>();
 		for(Vehicle vehicle: vehicles) 
@@ -166,18 +167,13 @@ public class AuctionAgent implements AuctionBehavior {
 					break;
 				}
 		}
-		System.out.println("1");
 		Solution guess = new Solution();
 		List<Solution> neighbours = new ArrayList<Solution>();
-		System.out.println("2");
 		guess.firstGuess(vehicles, this.pickups, this.deliveries);
 		
-		System.out.println("Building plan. Time allowed = " + (this.timeout_plan/60000));
 		int iterations = 0;
-		System.out.println("3");
 		long time_start = System.currentTimeMillis();
-		System.out.println("4");
-		while(System.currentTimeMillis()-time_start <= this.timeout_bid-1000) {
+		while(System.currentTimeMillis()-time_start <= this.timeout_bid-9000*this.timeout_bid/10000) {
 			neighbours = guess.neighbours(this.constraints, this.randomGenerator, 0.1);
 			guess = this.localChoice(guess, neighbours, this.probability);
 			iterations++;
@@ -209,9 +205,6 @@ public class AuctionAgent implements AuctionBehavior {
 			}
 		}
 			
-			
-		System.out.println("Done !");
-		
 		return plans;
 	}
 	
@@ -238,7 +231,7 @@ public class AuctionAgent implements AuctionBehavior {
 		Solution min = Collections.min(currentNeighbours);
 		//for (Solution sol: currentNeighbours)
 			//System.out.println(sol.cost());
-		System.out.println("Chosen: " + currentGuess.toString() + min.cost());
+		//System.out.println("Chosen: " + currentGuess.toString() + min.cost());
 		
 		if (this.randomGenerator.nextDouble() <= this.probability) {
 			return currentNeighbours.get(0);
