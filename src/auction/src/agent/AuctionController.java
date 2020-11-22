@@ -31,7 +31,7 @@ public class AuctionController {
     private int round = 0;
     private int competitors;
     
-    private double sd_weight = 0.7; //tIme To GEt HeURisTIc
+    private double sd_weight = 0.4; //tIme To GEt HeURisTIc
 
     private Topology graphTopology;
     private Integer agentID;
@@ -196,6 +196,23 @@ public class AuctionController {
         return new Tuple<Double,Double>(svar, rss);
     }
 
+    private ArrayList<Double> errors(){
+        ArrayList<Double> err = new ArrayList<Double>();
+        for(int i = 0; i<bidHistory.size(); i+=1){
+            Long minBid = Long.MAX_VALUE;
+            for(int j = 0; j<bidHistory.get(i).length; j+=1){
+                if(j!= this.agentID){
+                    if(bidHistory.get(i)[j] < minBid){
+                        minBid = bidHistory.get(i)[j];
+                    }
+                }
+                err.add((double) minBid-bidHistory.get(i)[this.agentID]);
+            }
+
+        }
+        return err;
+    }
+
     // returns an array of double tuples where left contains avg estimation and right contains variance
     private ArrayList<Tuple<Double,Double>> computeExPrice(Task newTask){ //fuck that language without tuples I created tuples myself
         Double[] newExCosts = this.exCostHistory.get(round);
@@ -276,11 +293,11 @@ public class AuctionController {
             printBidHistory(true);
     }
 
-    // computes an offer for a given task while learnign from the history
+    // computes an offer for a given task while learning from the history
     public Long returnPrice(Task task) {
 
         Long marginalCost = (long)2000;// here I should call the marginal cost for us to perform the task
-
+        Long price;
         if(round == 1){
             //cannot be found out at round 0
             this.competitors = this.bidHistory.get(0).length;   
@@ -291,7 +308,7 @@ public class AuctionController {
             this.exCostHistory.add(null); // we add a null element as the 0 of exCostHistory so that the ids line up
             this.estimatorHistory.add(null);
 
-            return (long)0.9*marginalCost;
+            price = (long) 0.9*marginalCost;
         }  
         else{
             //strategy for the following rounds
@@ -300,7 +317,7 @@ public class AuctionController {
             this.estimatorHistory.add(est);
 
             //this is where the strategy has to be implemented
-            return (long)0.9*marginalCost;
+            price = (long) 0.9*marginalCost;
         }
 
         round += 1; // increment the round number (behavior changes depending on time)
