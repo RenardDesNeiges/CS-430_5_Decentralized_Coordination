@@ -7,7 +7,7 @@
 \usepackage{amssymb} %math symbols
 \usepackage{mathtools} %more math stuff
 \usepackage{amsthm} %theorems, proofs and lemmas
-\usepackage[ruled,vlined,linesnumbered]{algorithm2e} %algoritms/pseudocode
+\usepackage[ruled,vlined]{algorithm2e} %algoritms/pseudocode
 
 %% Theorem notation
 \newtheorem{theorem}{Theorem}[section]
@@ -39,55 +39,22 @@
 \headsep=0.5in
 
 
-\title{Biding Algorithm - Problem Definition}
+\title{Biding Algorithm (problem definition)}
 \date{\today}
 %\author{Name}
 
 \begin{document}
 \maketitle	
 
-\subsection{General problem description}
-
-Our goal is to maximize our profit margin $M_p$ over all $n$ elements in the set $T$ of all $t_i$ auctions. Where $r(t_i)$ is the revenue from an auction ($r(t_i)=0$ of if the auction is lost) and $c(t_i)$ is the cost that carrying out an auctioned contract ($r(t_i)=0$ of if the auction is lost). In an adversarial setting where the contract is awarded to the lowest bidding agent $a$ (\textit{closed-bid first-price reverse auction}). Where $a\in A$ the set of all agents in the game. Our own agent is denoted as $\alpha \in A$.
+Our goal is to maximize our profit margin $M_p$ over all $n$ elements in the set $T$ of all $t_i$ auctions. Where $r(t_i)$ is the revenue from an auction and $c(t_i)$ is the cost that carrying out an auctioned contract. In an adversarial setting where the contract is awarded to the lowest bidder (\textit{closed-bid first-price reverse auction}).
 
 \begin{align}
     M_p = \sum_{t_i \in T} r(t_i) - \sum_{t_i \in T} c(t_i)
 \end{align}
 
-At each step $i$ our profit margin varies by a values $\Delta M_p(i)$ :
-
-\begin{align}
-    \Delta M_p(i) = r(t_i) - c(t_i)
-\end{align}
-
-For a given \textit{task} our decision algorithm has the following informations : 
+For a given \textit{task} our agent computes the following informations : 
 \begin{align*}
-    \text{Cost of adding a given task to the plan : } && c(t_i) && \forall t_i \\
-    \text{Price offered by every agent for previous bids : } && p(t_i,a) && \forall t_i,a\\
-    \text{Cost of carrying out auction for previous bids : } && c(i) && \forall i \\
-    \text{Winner of a given bid : } && w(i) && \forall i
+    \text{Cost of adding a given task to the plan : } && c(t_i) \\
 \end{align*}
-
-The problem can essentially be thought of as a \textit{multi-armed bandit} problem with an exploration/exploitation tradeoff, we will use a variation on \textit{Thomson Sampling}. The general idea is to fit a probability distribution to estimate our winning probability at each bid. And then pick a bidding amount from that probability distribution in such a way that our expected winning value $\mathbb{E}\left(\Delta M_p(i)\right)$ is maximal (greedy algorithm). Or to pick a value at random out of a distribution constructed in such a way that our expected winning value is maximized over time but we don't give up on exploration, which actually tends to yield better results than the greedy solution (\textit{Thomson Sampling}).
-
-\section{Defining error}
-
-We define the error made for a given auction as follows :
-\begin{align}
-    e(i) = \min_{\forall a \in A/ \alpha} \left\lbrace p(t_i,a) \right\rbrace - p(t_i,\alpha) 
-\end{align}
-
-For auctions that our agent won we have $e(i_{won})\geq 0$, for auctions lost we have $e(i_{won})\leq 0$. 
-
-
-
-
-\begin{algorithm}[H]
-    \SetAlgoLined
-    \caption{Thompson Sampling For Automatic Bidding}
-    \Repeat(){no task remains to be auctioned}{
-        Compute 
-    }
-\end{algorithm}
 
 \end{document}
