@@ -34,7 +34,7 @@ public class AuctionAgent implements AuctionBehavior {
 	private Random random;
 	private Vehicle vehicle;
 	private City currentCity;
-	private AuctionController auctionController = new AuctionController();
+	private AuctionController auctionController;
 
 	@Override
 	public void setup(Topology topology, TaskDistribution distribution,
@@ -44,6 +44,8 @@ public class AuctionAgent implements AuctionBehavior {
 		this.agent = agent;
 		this.vehicle = agent.vehicles().get(0);
 		this.currentCity = vehicle.homeCity();
+
+		this.auctionController = new AuctionController(topology,this.agent.id());
 
 		long seed = -9019554669489983951L * currentCity.hashCode() * agent.id();
 		this.random = new Random(seed);
@@ -58,7 +60,7 @@ public class AuctionAgent implements AuctionBehavior {
 		if (winner == agent.id()) {
 			currentCity = previous.deliveryCity;
 		}
-		auctionController.updateBidHistory(winner, bids);;
+		auctionController.updateBidHistory(winner, bids, previous);
 
 	}
 	
@@ -66,6 +68,8 @@ public class AuctionAgent implements AuctionBehavior {
 	/* method that is called when an auction is thrown */
 	public Long askPrice(Task task) {
 		//System.out.println("New Auction " + task);
+
+		this.auctionController.returnPrice(task);
 
 		if (vehicle.capacity() < task.weight)
 			return null;
