@@ -65,20 +65,20 @@ public class AuctionAgent implements AuctionBehavior {
 	public void setup(Topology topology, TaskDistribution distribution, Agent agent) {
 
 		// this code is used to get the timeouts
-         //LogistSettings ls = null;
-        // try {
-        //     ls = Parsers.parseSettings("config" + File.separator + "settings_default.xml");
-        // }
-        // catch (Exception exc) {
-        //     System.out.println("There was a problem loading the configuration file.");
-        // }
+         LogistSettings ls = null;
+         try {
+             ls = Parsers.parseSettings("config" + File.separator + "settings_auction.xml");
+         }
+         catch (Exception exc) {
+             System.out.println("There was a problem loading the configuration file.");
+         }
         
         // the setup method cannot last more than timeout_setup milliseconds
-        this.timeout_setup = 30000;//ls.get(LogistSettings.TimeoutKey.SETUP);
+        this.timeout_setup = ls.get(LogistSettings.TimeoutKey.SETUP);
         // the plan method cannot execute more than timeout_plan milliseconds
-        this.timeout_plan = 30000;// ls.get(LogistSettings.TimeoutKey.PLAN);
+        this.timeout_plan = ls.get(LogistSettings.TimeoutKey.PLAN);
         // the bid method cannot execute more than timeout_bid milliseconds
-        this.timeout_bid = 30000;// ls.get(LogistSettings.TimeoutKey.BID);
+        this.timeout_bid = ls.get(LogistSettings.TimeoutKey.BID);
         
         this.topology = topology;
         this.distribution = distribution;
